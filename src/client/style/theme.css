@@ -1,13 +1,60 @@
 :root {
-  /* Main brand colors */
-  --color-bg-dark: #222831;
-  --color-bg-light: #393E46;
-  --color-accent: #00ADB5;
-  --color-text: #EEEEEE;
+  /* Apple Arcade inspired colors */
+  --color-bg-dark: #1a1a2e;
+  --color-bg-light: #16213e;
+  --color-bg-gradient: #0f3460;
+  --color-accent: #00d4ff;
+  --color-accent-secondary: #ff6b6b;
+  --color-text: #ffffff;
+  --color-text-secondary: #e0e6ed;
+  --color-success: #4ecdc4;
+  --color-warning: #ffe66d;
 
   /* RGB equivalents */
-  --rgb-bg-dark: 34, 40, 49;
-  --rgb-bg-light: 57, 62, 70;
-  --rgb-accent: 0, 173, 181;
-  --rgb-text: 238, 238, 238;
+  --rgb-bg-dark: 26, 26, 46;
+  --rgb-bg-light: 22, 33, 62;
+  --rgb-bg-gradient: 15, 52, 96;
+  --rgb-accent: 0, 212, 255;
+  --rgb-accent-secondary: 255, 107, 107;
+  --rgb-text: 255, 255, 255;
+  --rgb-text-secondary: 224, 230, 237;
+  --rgb-success: 78, 205, 196;
+  --rgb-warning: 255, 230, 109;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-light) 50%, var(--color-bg-gradient) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, #0099cc 100%);
+  --gradient-button: linear-gradient(135deg, var(--color-accent) 0%, #0088bb 100%);
+  --gradient-card: linear-gradient(135deg, #2a2a3e 0%, var(--color-bg-dark) 100%);
+
+  /* Typography */
+  --font-title: 48px;
+  --font-heading: 36px;
+  --font-body: 24px;
+  --font-button: 28px;
+
+  /* Mobile typography */
+  --font-title-mobile: 32px;
+  --font-heading-mobile: 24px;
+  --font-body-mobile: 18px;
+  --font-button-mobile: 20px;
+
+  /* Spacing */
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+
+  /* Border radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  /* Shadows for depth */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --shadow-accent: 0 4px 16px rgba(0, 212, 255, 0.3);
 }

@@ -11,7 +11,7 @@ export class Boot extends Scene {
 
     // Load background for preloader
     this.load.image('background', 'assets/bg.png');
-    this.load.spritesheet('logo', 'assets/splash_11zon.png', {
+    this.load.spritesheet('splash', 'assets/splash.png', {
       frameWidth: 256,
       frameHeight: 256,
     });
