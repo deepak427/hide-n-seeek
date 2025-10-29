@@ -1,53 +1,105 @@
 import express from 'express';
-import { InitResponse } from '../shared/types/api';
-import { redis, createServer, context, reddit } from '@devvit/web/server';
+import {
+  CreateGameRequest,
+  CreateGameResponse,
+  GetGameResponse,
+  GuessRequest,
+  GuessResponse,
+} from '../shared/types/api';
+import { createServer, context } from '@devvit/web/server';
 import { createPost } from './core/post';
-import { saveHidingSpot } from './core/storage';
+import { saveGameState, getGameState } from './core/storage';
 import { v4 as uuidv4 } from 'uuid';
-import { media } from '@devvit/media';
+import { GameState } from '../shared/types';
 
 const app = express();
 
 // Middleware for JSON body parsing
 app.use(express.json());
-// Middleware for URL-encoded body parsing
-app.use(express.urlencoded({ extended: true }));
-// Middleware for plain text body parsing
-app.use(express.text());
 
 const router = express.Router();
 
-router.get<{ postId: string }, InitResponse | { status: string; message: string }>(
-  '/api/init',
-  async (_req, res): Promise<void> => {
-    const { postId } = context;
+router.post('/api/create-game', async (req, res): Promise<void> => {
+  const { playerId, mapKey, hiddenObjectId } = req.body as CreateGameRequest;
+  if (!playerId || !mapKey || !hiddenObjectId) {
+    res.status(400).json({ error: 'playerId, mapKey, and hiddenObjectId are required.' });
+    return;
+  }
 
-    if (!postId) {
-      console.error('API Init Error: postId not found in devvit context');
-      res.status(400).json({
-        status: 'error',
-        message: 'postId is required but missing from context',
-      });
+  try {
+    const gameId = uuidv4();
+    const gameState: GameState = {
+      gameId,
+      mapKey,
+      hiddenObjectId,
+      creatorId: playerId,
+      status: 'waiting_for_guess',
+      guesses: [],
+    };
+    await saveGameState(gameId, gameState);
+
+    res.json({ gameId } as CreateGameResponse);
+  } catch (error) {
+    console.error('Error creating game:', error);
+    res.status(500).json({ error: 'Failed to create game.' });
+  }
+});
+
+router.get('/api/get-game/:gameId', async (req, res): Promise<void> => {
+  const { gameId } = req.params;
+  if (!gameId) {
+    res.status(400).json({ error: 'gameId is required.' });
+    return;
+  }
+
+  try {
+    const gameState = await getGameState(gameId);
+    if (!gameState) {
+      res.status(404).json({ error: 'Game not found.' });
       return;
     }
 
-    try {
-      const count = await redis.get('count');
-      res.json({
-        type: 'init',
-        postId: postId,
-        count: count ? parseInt(count) : 0,
-      });
-    } catch (error) {
-      console.error(`API Init Error for post ${postId}:`, error);
-      let errorMessage = 'Unknown error during initialization';
-      if (error instanceof Error) {
-        errorMessage = `Initialization failed: ${error.message}`;
-      }
-      res.status(400).json({ status: 'error', message: errorMessage });
-    }
+    res.json({
+      mapKey: gameState.mapKey,
+      creatorId: gameState.creatorId,
+      status: gameState.status,
+    } as GetGameResponse);
+  } catch (error) {
+    console.error('Error getting game:', error);
+    res.status(500).json({ error: 'Failed to get game.' });
   }
-);
+});
+
+router.post('/api/guess', async (req, res): Promise<void> => {
+  const { gameId, playerId, objectId } = req.body as GuessRequest;
+  if (!gameId || !playerId || !objectId) {
+    res.status(400).json({ error: 'gameId, playerId, and objectId are required.' });
+    return;
+  }
+
+  try {
+    const gameState = await getGameState(gameId);
+    if (!gameState) {
+      res.status(404).json({ error: 'Game not found.' });
+      return;
+    }
+
+    const correct = gameState.hiddenObjectId === objectId;
+    const guess = { playerId, objectId, correct };
+    gameState.guesses.push(guess);
+    if(correct) {
+      gameState.status = 'finished';
+    }
+
+    await saveGameState(gameId, gameState);
+
+    res.json({ correct, gameState } as GuessResponse);
+  } catch (error) {
+    console.error('Error making guess:', error);
+    res.status(500).json({ error: 'Failed to make guess.' });
+  }
+});
+
 
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {
@@ -79,43 +131,6 @@ router.post('/internal/menu/post-create', async (_req, res): Promise<void> => {
       status: 'error',
       message: 'Failed to create post',
     });
-  }
-});
-
-router.post('/api/share', async (req, res): Promise<void> => {
-  const { imageData, hidingSpot } = req.body;
-  if (!imageData || !hidingSpot) {
-    res.status(400).json({ error: 'imageData and hidingSpot are required.' });
-    return;
-  }
-
-  try {
-    const { subredditName } = context;
-    if (!subredditName) {
-      throw new Error('subredditName is required');
-    }
-
-    const gameId = uuidv4();
-    saveHidingSpot(gameId, hidingSpot);
-
-    const mediaAsset = await media.upload({
-      url: imageData,
-      type: 'image',
-    });
-
-    const post = await reddit.submitPost({
-      subredditName,
-      title: 'Where am I?',
-      url: mediaAsset.mediaUrl,
-    });
-
-    res.json({
-      success: true,
-      postUrl: `https://www.reddit.com${post.permalink}`,
-    });
-  } catch (error) {
-    console.error('Error sharing post:', error);
-    res.status(500).json({ error: 'Failed to share post.' });
   }
 });
 

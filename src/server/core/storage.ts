@@ -1,14 +1,11 @@
-interface HidingSpot {
-  x: number;
-  y: number;
-}
+import { redis } from '@devvit/web/server';
+import { GameState } from '../../shared/types';
 
-const storage = new Map<string, HidingSpot>();
-
-export const saveHidingSpot = (gameId: string, spot: HidingSpot) => {
-  storage.set(gameId, spot);
+export const saveGameState = async (gameId: string, state: GameState): Promise<void> => {
+  await redis.set(gameId, JSON.stringify(state));
 };
 
-export const getHidingSpot = (gameId: string) => {
-  return storage.get(gameId);
+export const getGameState = async (gameId: string): Promise<GameState | null> => {
+  const state = await redis.get(gameId);
+  return state ? JSON.parse(state) : null;
 };

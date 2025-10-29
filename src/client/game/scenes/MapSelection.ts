@@ -26,7 +26,7 @@ export class MapSelection extends Scene {
       .setStrokeStyle(4, 0xffffff)
       .setInteractive({ useHandCursor: true });
 
-    const mapTitle = this.add
+    this.add
       .text(mapCard.x, mapCard.y, 'Map 1', {
         fontFamily: 'Arial',
         fontSize: '32px',
