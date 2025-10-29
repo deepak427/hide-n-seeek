@@ -1,0 +1,13 @@
+:root {
+  /* Main brand colors */
+  --color-bg-dark: #222831;
+  --color-bg-light: #393E46;
+  --color-accent: #00ADB5;
+  --color-text: #EEEEEE;
+
+  /* RGB equivalents */
+  --rgb-bg-dark: 34, 40, 49;
+  --rgb-bg-light: 57, 62, 70;
+  --rgb-accent: 0, 173, 181;
+  --rgb-text: 238, 238, 238;
+}
