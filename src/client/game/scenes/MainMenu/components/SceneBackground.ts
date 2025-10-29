@@ -1,4 +1,4 @@
-import { GameObjects, Scene } from 'phaser';
+import { GameObjects } from 'phaser';
 import { BackgroundConfig } from '../../../../types/ui';
 import { Theme } from '../../../../style/theme';
 

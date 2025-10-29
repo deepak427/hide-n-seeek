@@ -1,8 +1,9 @@
-import { Scene } from 'phaser';
+import Phaser, { Scene } from 'phaser';
 import { SceneBackground } from './components/SceneBackground';
 import { MapCard } from './components/MapCard';
 import { BackButton } from './components/BackButton';
 import { Theme } from '../../../style/theme';
+import { GameState } from '../../../../shared/types';
 
 export class MapSelection extends Scene {
   private background!: SceneBackground;
@@ -21,6 +22,14 @@ export class MapSelection extends Scene {
   }
 
   create(): void {
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameId = urlParams.get('gameId');
+
+    if (gameId) {
+      void this.joinGame(gameId);
+      return;
+    }
+
     const { width, height } = this.scale;
 
     // 🎨 Background
@@ -68,8 +77,25 @@ export class MapSelection extends Scene {
     this.scale.on('resize', this.resize, this);
   }
 
+  private async joinGame(gameId: string) {
+    try {
+      const response = await fetch(`/api/game/${gameId}`);
+      if (!response.ok) {
+        throw new Error('Game not found');
+      }
+      const gameState: GameState = await response.json();
+      this.scene.start('Game', { mapKey: gameState.mapKey, gameId });
+    } catch (error) {
+      console.error(error);
+      // Handle error, e.g., show a message to the user and go to the main menu
+      this.scene.start('MainMenu');
+    }
+  }
+
   private resize(gameSize: Phaser.Structs.Size): void {
     const { width, height } = gameSize;
-    this.background.resize(width, height);
+    if (this.background) {
+      this.background.resize(width, height);
+    }
   }
 }

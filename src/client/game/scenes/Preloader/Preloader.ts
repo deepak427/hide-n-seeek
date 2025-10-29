@@ -1,5 +1,4 @@
 import { Scene } from 'phaser';
-import { Theme } from '../../../style/theme';
 import { LoadingBar } from './components/LoadingBar';
 import { LoadingText } from './components/LoadingText';
 import { SplashAnimation } from './components/SplashAnimation';
@@ -7,37 +6,38 @@ import { SplashAnimation } from './components/SplashAnimation';
 export class Preloader extends Scene {
   private loadingBar!: LoadingBar;
   private loadingText!: LoadingText;
+  private splash!: SplashAnimation;
 
   constructor() {
     super('Preloader');
   }
 
+  preload() {
+    this.load.image('splash', 'assets/default-splash.png');
+  }
+
   create() {
-    const { width, height } = this.scale;
-
-    // Background
-    this.add.rectangle(width / 2, height / 2, width, height, Theme.bgDark);
-    this.add.rectangle(width / 2, height / 2, width, height, Theme.bgLight, 0.5);
-
-    // Components
+    this.splash = new SplashAnimation(this);
     this.loadingBar = new LoadingBar(this);
     this.loadingText = new LoadingText(this);
 
-    // Handle progress
-    this.load.on('progress', (p: number) => this.loadingBar.update(p));
-    this.load.on('fileprogress', (f: any) => this.loadingText.update(this.load.progress, f.key));
-
-    // On complete → transition
-    this.load.once('complete', () => {
-      this.loadingBar.setVisible(false);
-      this.loadingText.setVisible(false);
-      new SplashAnimation(this);
-      this.time.delayedCall(3000, () => this.scene.start('MainMenu'));
+    this.load.on('progress', (value: number) => {
+      this.loadingBar.update(value);
+      this.loadingText.update(value);
     });
 
-    // Simulate load
-    this.load.image('map1', 'assets/maps/map1.png');
-    this.load.spritesheet('splash', 'assets/splash.png', { frameWidth: 256, frameHeight: 256 });
-    this.load.start();
+    this.load.on('fileprogress', (file: { key: string }) => {
+      this.loadingText.update(this.load.progress, file.key);
+    });
+
+    this.load.on('complete', () => {
+      this.splash.play(() => {
+        this.scene.start('MainMenu');
+      });
+    });
+
+    this.load.image('map1', 'assets/map1.png');
+    this.load.image('map2', 'assets/map2.png');
+    this.load.image('map3', 'assets/map3.png');
   }
 }

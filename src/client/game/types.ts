@@ -1,7 +1,5 @@
-import Phaser from 'phaser';
-
 export interface SceneComponent {
-  create(...args: any[]): void;
+  create(...args: unknown[]): void;
   resize?(): void;
   destroy?(): void;
 }

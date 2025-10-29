@@ -1,8 +1,10 @@
+import Phaser from 'phaser';
 import { Theme } from '../../../../style/theme';
 
 export class UIManager {
   private backBtn!: Phaser.GameObjects.Container;
   private shareBtn!: Phaser.GameObjects.Text;
+  private guessResultText!: Phaser.GameObjects.Text;
 
   constructor(private scene: Phaser.Scene) { }
 
@@ -25,15 +27,28 @@ export class UIManager {
     }).setOrigin(0.5).setInteractive().setVisible(false);
 
     this.shareBtn.on('pointerdown', onShare);
+
+    this.guessResultText = this.scene.add.text(width / 2, height / 2, '', {
+      fontSize: '48px',
+      color: '#fff',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      padding: { x: 20, y: 10 },
+    }).setOrigin(0.5).setVisible(false);
   }
 
   resize() {
     const { width, height } = this.scene.scale;
     this.backBtn.setPosition(width * 0.05, height * 0.05);
     this.shareBtn.setPosition(width / 2, height - 60);
+    this.guessResultText.setPosition(width / 2, height / 2);
   }
 
   showShare() {
     this.shareBtn.setVisible(true);
+  }
+
+  showGuessResult(correct: boolean) {
+    this.guessResultText.setText(correct ? 'CORRECT!' : 'WRONG!');
+    this.guessResultText.setVisible(true);
   }
 }

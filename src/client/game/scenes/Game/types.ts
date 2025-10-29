@@ -18,7 +18,7 @@ export interface HidingObject {
  * (helps when calling .create() and .resize() in main Game.ts)
  */
 export interface SceneComponent {
-  create(...args: any[]): void;
+  create(...args: unknown[]): void;
   resize?(): void;
   destroy?(): void;
 }

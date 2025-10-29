@@ -1,10 +1,10 @@
-import { Scene } from 'phaser';
+import Phaser, { Scene } from 'phaser';
 
 export class LoadingText {
   private text: Phaser.GameObjects.Text;
   private progressText: Phaser.GameObjects.Text;
 
-  constructor(private scene: Scene) {
+  constructor(scene: Scene) {
     const { width, height } = scene.scale;
 
     this.text = scene.add.text(width / 2, height * 0.7, 'LOADING...', {

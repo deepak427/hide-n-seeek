@@ -1,10 +1,15 @@
+import Phaser from 'phaser';
 import { ObjectManager } from './ObjectManager';
 
 export class MapLayer {
   private map!: Phaser.GameObjects.Image;
   private objectManager!: ObjectManager;
 
-  constructor(private scene: Phaser.Scene, private mapKey: string) {}
+  constructor(
+    private scene: Phaser.Scene,
+    private mapKey: string,
+    private onHidingSpotSelected: (objectId: string) => void
+  ) {}
 
   create() {
     const { width, height } = this.scene.scale;
@@ -13,7 +18,7 @@ export class MapLayer {
     const scale = Math.min((width * 0.9) / this.map.width, (height * 0.8) / this.map.height);
     this.map.setScale(scale);
 
-    this.objectManager = new ObjectManager(this.scene, this.map);
+    this.objectManager = new ObjectManager(this.scene, this.map, this.onHidingSpotSelected);
     this.objectManager.add('pumpkin', 0.75, 0.85);
     this.objectManager.add('wardrobe', 0.25, 0.82);
   }
@@ -32,5 +37,9 @@ export class MapLayer {
 
   getObjects() {
     return this.objectManager.getAll();
+  }
+
+  disableHidingSpots() {
+    this.objectManager.disable();
   }
 }

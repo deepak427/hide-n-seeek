@@ -1,4 +1,4 @@
-import { Scene } from 'phaser';
+import Phaser, { Scene } from 'phaser';
 import { SceneBackground } from './components/SceneBackground';
 import { MenuButton } from './components/MenuButton';
 import { TitleText } from './components/TitleText';

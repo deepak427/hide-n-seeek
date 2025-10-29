@@ -1,4 +1,4 @@
-import { Scene } from 'phaser';
+import Phaser, { Scene } from 'phaser';
 import { Theme } from '../../../../style/theme';
 import { LoadingBarOptions } from '../../../types';
 
@@ -7,7 +7,7 @@ export class LoadingBar {
   private bg: Phaser.GameObjects.Rectangle;
   private glow: Phaser.GameObjects.Rectangle;
 
-  constructor(private scene: Scene, opts: LoadingBarOptions = {}) {
+  constructor(scene: Scene, opts: LoadingBarOptions = {}) {
     const { width = 400, height = 20, x = scene.scale.width / 2, y = scene.scale.height * 0.75 } = opts;
 
     this.bg = scene.add
